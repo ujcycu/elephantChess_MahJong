@@ -1,5 +1,6 @@
 # import
 import tkinter as tk
+import math
 
 # 描繪視窗
 win = tk.Tk()
@@ -9,64 +10,81 @@ win.geometry("600x400")
 canvas = tk.Canvas(win, width = 600, height = 400, bg = "#002240")
 canvas.place(x = 0, y = 0)
 
-x = 300
-y = 200
-
-#canvas.create_oval(x-50, y-50, x+50, y+50, fill="white", width=4, outline="#f00")
-#canvas.create_oval(x-15, y-15, x+15, y+15, fill="white", width=3, outline="#f00")
-#canvas.create_text(x, y, text="象", fill="#f00", font=("標楷體",18,"bold"))
-
-a = 200
-b = 200
-
-circle = [
-    a-20, b,
-    a, b-20,
-    a+20, b,
-    a, b+20,
-    a-20, b
-    ]
-
-#canvas.create_oval(a-20, b-20, a+20, b+20, smooth=True, fill="white", width=4, outline="#f00")
-
-#canvas.create_text(a, b, text="○", fill="red", font=("標楷體",28,"bold"))
-#canvas.create_text(a, b, text="相", fill="#f00", font=("標楷體",16,"bold"))
-
+x0 = 50
+y0 = 100
 fontAttr = ["標楷體",16,"bold"]
+"""
+canvas.create_text(x, y, text="●", fill="white", font=("標楷體",34,"bold"))
+canvas.create_text(x, y, text="○", fill="black", font=("標楷體",28,"bold"))
+canvas.create_text(x, y, text="將", fill="black", font=("標楷體",19,"bold"))
+"""
+# 類別
+class OpenChess:
+    # 建構子
+    def __init__(self, index):
+        self.index = index
+        x = self.index % 6
+        y = math.floor(self.index / 6)
+        dx = 50
+        dy = 50
+        self.point = [x0 + dx * x, y0 + dy * y]
+    
+    # 方法
+    def add(self):
+        #print(self.point)
+        #canvas.create_text(self.point[0]+2, self.point[1]+2, text="●", fill="#00172b", font=("標楷體",34,"bold"))
+        canvas.create_text(self.point, text="●", fill="white", font=("標楷體",34,"bold"))
+        if self.index < 16: #黑棋
+            canvas.create_text(self.point, text="○", fill="black", font=("標楷體",28,"bold"))
+            canvas.create_text(self.point, text="將", fill="black", font=("標楷體",19,"bold"))
+        else: #紅棋
+            canvas.create_text(self.point, text="○", fill="red", font=("標楷體",28,"bold"))
+            canvas.create_text(self.point, text="帥", fill="red", font=("標楷體",19,"bold"))
+    def delete(self):
+        canvas.create_text(self.point, text="●", fill="#002240", font=("標楷體",35,"bold"))
 
-canvas.create_text(a+150, b, text="●", fill="white", font=("標楷體",34,"bold"))
-canvas.create_text(a+150, b, text="●", fill="black", font=("標楷體",29,"bold"))
-canvas.create_text(a+150, b, text="●", fill="white", font=("標楷體",25,"bold"))
-canvas.create_text(a+150, b, text="將", fill="black", font=("標楷體",19,"bold"))
-
-canvas.create_text(a, b, text="●", fill="white", font=("標楷體",30,"bold"))
-canvas.create_text(a, b, text="●", fill="black", font=("標楷體",26,"bold"))
-canvas.create_text(a, b, text="●", fill="white", font=("標楷體",22,"bold"))
-canvas.create_text(a, b, text="將", fill="black", font=("標楷體",18,"bold"))
-
-canvas.create_text(a+50, b, text="●", fill="white", font=("標楷體",32,"bold"))
-canvas.create_text(a+50, b, text="○", fill="black", font=("標楷體",28,"bold"))
-canvas.create_text(a+50, b, text="將", fill="black", font=("標楷體",20,"bold"))
-
-canvas.create_text(a+100, b, text="●", fill="white", font=("標楷體",34,"bold"))
-canvas.create_text(a+100, b, text="○", fill="black", font=("標楷體",28,"bold"))
-canvas.create_text(a+100, b, text="將", fill="black", font=("標楷體",19,"bold"))
-
-x1 = 420
-y1 = 200
-#canvas.create_arc(x1-20, y1, x1, y1+20, start=0, extent=360, width=3, fill='white')
-
-#canvas.create_oval(x1-50, y1-50, x1+50, y1+50, fill="white")
-#canvas.create_arc(x1-50, y1-50, x1+50, y1+50, extent=359.5, width=4, outline="red", style='arc')
-#canvas.create_text(x1, y1, text="象", fill="#f00", font=("標楷體",18,"bold"))
-#canvas.create_arc(110, 10, 200, 100, start=60, extent=180)
-#canvas.create_arc(210, 10, 300, 100, start=60, extent=70, width=8, fill='#f00')
-#canvas.create_arc(10, 110, 100, 200, start=60, extent=180, width=8, fill='#f00', outline='#00f')
-#canvas.create_arc(110, 110, 200, 200, start=-60, extent=-120, width=3, fill='#fff', outline='#0a0', dash=(5,5))
-#canvas.create_arc(210, 110, 300, 200, start=-60, extent=-90, width=3, fill='#ff0', outline='#f50', dash=(5,10), style='arc')
+class ClosrChess:
+    # 建構子
+    def __init__(self, index):
+        self.index = index
+        x = math.floor(self.index / 5)
+        y = self.index % 5
+        dx = 50
+        dy = 40
+        self.point = [x1 - dx * x, y1 - dy * y]
+    
+    # 方法
+    def add(self):
+        canvas.create_text(self.point, text="●", fill="green", font=("標楷體",34,"bold"))
+        canvas.create_text(self.point, text=self.index, fill="white", font=("標楷體",20,"bold"))
+    def delete(self):
+        canvas.create_text(self.point, text="●", fill="#002240", font=("標楷體",35,"bold"))
 
 
-#label = tk.Label(win, text="象", font=("標楷體",12), fg="#f00")
-#label.place(100,200)
+x1 =(x0 + 50 * 6) + 50 * 4 + 10
+y1 = y0 + 50 * 3
+for i in range(24):
+    OpenChess(i).add()
+    ClosrChess(i).add()
+OpenChess(23).delete()
+ClosrChess(23).delete()
+
+"""
+canvas.create_rectangle(x1-25, y1-20, x1+25, y1+20, fill="red")
+canvas.create_text(x1, y1, text="●", fill="white", font=("標楷體",34,"bold"))
+def addClose(x1,y1):
+    point = [x1-20, y1, x1+20, y1+20]
+    point2 = [x1-20, y1-5, x1+20, y1+10]
+    point3 = [x1-20, y1-10, x1+20, y1+10]
+    point4 = [x1-20, y1-15, x1+20, y1+5]
+    canvas.create_oval(point, fill="white")
+    canvas.create_rectangle(point2, fill="white", width=0)
+    canvas.create_oval(point3, fill="green")
+    canvas.create_oval(point4, fill="green")
+    canvas.create_line(x1-20, y1-5, x1-20, y1+10, fill="black")
+    canvas.create_line(x1+20, y1-5, x1+20, y1+10, fill="black")
+addClose(x1,y1)
+addClose(x1,y1-15)
+"""
 
 win.mainloop()
