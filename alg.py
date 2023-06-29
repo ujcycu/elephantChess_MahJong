@@ -18,7 +18,7 @@ def transChi(array):
         #print(elephant[i])
     return arr
 
-# 判定湖了
+# 判定胡了
 def classify(array):
     chi = transChi(array)
     countB = chi.count('卒')
@@ -33,20 +33,46 @@ def classify(array):
             if two == True:
                 return "3卒/兵+對子!!!"
             else:
-                return "KOG1"
+                return "KOG"
     elif countB == 2 or countR == 2:
         three = matchThree(array) #找順子
         if three == True:
             return "2卒/兵+順子!!!"
         else:
-            return "KOG2"
+            return "KOG"
     else:
         two = matchTwo(array)
         three = matchThree(array)
-        if two == True and three == True:
-            return "對子+順子"
+        if three == True and two == True:
+            checkArr = array
+            #print(checkArr)
+            for i in checkArr:
+                if i == 0: #將
+                    for j in checkArr:
+                        if j == 16:
+                            checkArr.remove(i)
+                            checkArr.remove(j)
+                            #print(i,j) #"將帥"
+                elif i > 0 and i <= 10: #士象車馬包 1-10
+                    if i%2 == 0:
+                        for j in checkArr:
+                            if j == i-1:
+                                checkArr.remove(i)
+                                checkArr.remove(j)
+                                #print(i,j) #"兩支一樣的(黑)"
+                elif i > 16 and i <= 26:
+                    if i%2 == 0:
+                        for j in checkArr:
+                            if j == i-1:
+                                checkArr.remove(i)
+                                checkArr.remove(j)
+                                #print(i,j) #"兩支一樣的(紅)"
+            if matchThree(checkArr) == True:
+                return "對子+順子"
+            else:
+                return "KOG"
         else:
-            return "KOG3"
+            return "KOG"
         
 # 對子
 def matchTwo(array): #0, 1-10; 16, 17-26
@@ -106,7 +132,10 @@ for i in range(32):
 #chess = [25, 2, 23, 22, 1] 
 
 #print(transChi(chess).count('卒'),"卒",transChi(chess).count('兵'),"兵")
-chess = random.sample(elephant_num, 5)
+#chess = random.sample(elephant_num, 5)
+
+chess = [15, 9, 8, 6, 7] # ['卒', '包', '馬', '車', '馬']
+#chess = [11, 12, 13, 14, 0]
 print(chess)
 print(transChi(chess))
 print(classify(chess))
