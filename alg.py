@@ -119,10 +119,11 @@ def matchThree(array): #0, 1-10; 16, 17-26
                     for k in array:
                         if k == 25 or k == 26:
                             return True #俥傌炮
-
+"""
 elephant_num = []
 for i in range(32):
     elephant_num.append(i)
+"""    
 #print(elephant_num)
 #transChi(elephant_num)
 
@@ -134,8 +135,10 @@ for i in range(32):
 #print(transChi(chess).count('卒'),"卒",transChi(chess).count('兵'),"兵")
 #chess = random.sample(elephant_num, 5)
 
-chess = [15, 9, 8, 6, 7] # ['卒', '包', '馬', '車', '馬']
+#chess = [15, 9, 8, 6, 7] # ['卒', '包', '馬', '車', '馬']
 #chess = [11, 12, 13, 14, 0]
+"""
 print(chess)
 print(transChi(chess))
 print(classify(chess))
+"""

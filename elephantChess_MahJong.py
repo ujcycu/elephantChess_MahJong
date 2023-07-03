@@ -1,33 +1,107 @@
+# import
 import random
 import tkinter as tk
 from tkinter import messagebox
 from alg import transChi,classify,matchTwo,matchThree
+import math
+
+
+
+
+# 類別
+class OpenChess:
+    # 建構子
+    def __init__(self, index, x0, y0):
+        x = desk.index(index) % 6
+        y = math.floor(desk.index(index) / 6)
+        self.point = [x0 + grid * x, y0 + grid * y]
+        self.chi = transChi([index])
+        self.index = index
+    
+    # 方法
+    def add(self):
+        canvas.create_text(self.point, text="●", fill="white", font=("標楷體",34,"bold"))
+        if self.index < 16: #黑棋
+            canvas.create_text(self.point, text="○", fill="black", font=("標楷體",28,"bold"))
+            canvas.create_text(self.point, text=self.chi, fill="black", font=("標楷體",19,"bold"))
+        else: #紅棋
+            canvas.create_text(self.point, text="○", fill="red", font=("標楷體",28,"bold"))
+            canvas.create_text(self.point, text=self.chi, fill="red", font=("標楷體",19,"bold"))
+    def delete(self):
+        canvas.create_text(self.point, text="●", fill="#002240", font=("標楷體",35,"bold"))
+
+class CloseChess:
+    # 建構子
+    def __init__(self, index, x1, y1):
+        x = math.floor(elephant_num.index(index) / 5)
+        y = elephant_num.index(index) % 5
+        self.point = [x1 - grid * x, y1 - (grid-10) * y]
+        self.chi = transChi([index])
+        self.index = index
+    
+    # 方法
+    def add(self):
+        canvas.create_text(self.point, text="●", fill="green", font=("標楷體",34,"bold"))
+        canvas.create_text(self.point, text=(self.index,self.chi), fill="white", font=("標楷體",10,"bold"))
+    def delete(self):
+        canvas.create_text(self.point, text="●", fill="#002240", font=("標楷體",35,"bold"))
+
+class BossChess():
+    def __init__(self, index, x2, y2, whose):
+        if whose == "boss":
+            x = boss.index(index) % len(boss) #%4
+        elif whose == "user":
+            x = user.index(index) % len(user)
+        #dx = 50
+        self.point = [x2 + grid * x, y2]
+        self.chi = transChi([index])
+        self.index = index
+    def add(self):
+        canvas.create_text(self.point, text="●", fill="green", font=("標楷體",34,"bold"))
+        canvas.create_text(self.point, text=self.chi, fill="black", font=("標楷體",19,"bold"))
+    def delete(self):
+        canvas.create_text(self.point, text="●", fill="#002240", font=("標楷體",35,"bold"))
+class UserChess(BossChess):
+    def add(self):
+        canvas.create_text(self.point, text="●", fill="white", font=("標楷體",34,"bold"))
+        if self.index < 16: #黑棋
+            canvas.create_text(self.point, text="○", fill="black", font=("標楷體",28,"bold"))
+            canvas.create_text(self.point, text=self.chi, fill="black", font=("標楷體",19,"bold"))
+        else: #紅棋
+            canvas.create_text(self.point, text="○", fill="red", font=("標楷體",28,"bold"))
+            canvas.create_text(self.point, text=self.chi, fill="red", font=("標楷體",19,"bold"))
+
 
 
 # 洗牌
 def shuffle(array):
     random.shuffle(array)
     #print(array)
+    
 # 發牌
-def dealingCard():
+def dealingCard(e):
     print("== 發牌 ==")
     #shuffle(elephant)
+    # 洗牌
+    for i in range(32):
+        elephant_num.append(i)
     shuffle(elephant_num)
     print("elephant_num length= ",len(elephant_num))
+    # 各發四張
     for i in range(4):
-        boss.append(elephant_num[0])
-        elephant_num.pop(0)
-        user.append(elephant_num[0])
-        elephant_num.pop(0)
-    """
-    print(elephant_num)
-    print("elephant = ",transChi(elephant_num))
-    print("boss = ",transChi(boss))
-    print("user = ",transChi(user))
-    """
-    printText()
-    bossbox.insert(tk.END, transChi(boss))
-    userbox.insert(tk.END, transChi(user))
+        boss.append(elephant_num[0]) 
+        elephant_num.pop(0) 
+        user.append(elephant_num[0]) 
+        elephant_num.pop(0) 
+    log() #log
+    # 畫棋子
+    for i in boss:
+        BossChess(i,xb,yb,"boss").add()
+    for i in user:
+        UserChess(i,xu,yu,"user").add()
+    for i in elephant_num:
+        CloseChess(i,x1,y1).add()
+    # 輪到
     Flag = "boss"
     print("輪到", Flag)
     flag(Flag)
@@ -35,19 +109,19 @@ def dealingCard():
 # 莊家隨機出牌
 def bossPlayingCard():
     print("== 莊家出牌 ==")
-    shuffle(boss)
+    # 清除
+    for i in boss:
+        BossChess(i,xb,yb,"boss").delete()
+    shuffle(boss) #洗牌
+    # 桌牌
     desk.append(boss[0])
+    OpenChess(desk[len(desk)-1],x0,y0).add()
     boss.pop(0)
-    """
-    print("elephant = ",transChi(elephant_num))
-    print("desk = ",transChi(desk))
-    print("boss = ",transChi(boss))
-    """
-    printText()
-    bossbox.delete(1.0, tk.END) #清空
-    deskbox.delete(1.0, tk.END) #清空
-    bossbox.insert(tk.END, transChi(boss))
-    deskbox.insert(tk.END, transChi(desk))
+    # 手牌
+    for i in boss:
+        BossChess(i,xb,yb,"boss").add()
+
+    log()
     if elephant_num == []:
         tk.messagebox.showinfo("本局", "和局!!!")
     Flag = "user"
@@ -57,22 +131,19 @@ def bossPlayingCard():
 # 撿牌
 def pickingupCard(who, whose):
     print("==", whose,"撿牌 ==")
+    # 手牌
     n = len(desk)-1
-    #print(n)
     who.append(desk[n])
-    #desk.pop(0)
-    desk.pop(n)
     if judge(whose) == "boss":
-        bossbox.delete(1.0, tk.END) #清空
-        bossbox.insert(tk.END, transChi(boss))
+        BossChess(boss[len(boss)-1],xb,yb,"boss").add()
     if judge(whose) == "user":
-        userbox.delete(1.0, tk.END) #清空
-        userbox.insert(tk.END, transChi(user))
-    deskbox.delete(1.0, tk.END) #清空
-    deskbox.insert(tk.END, transChi(desk))
+        UserChess(user[len(user)-1],xu,yu,"user").add()
+    # 桌牌
+    OpenChess(desk[len(desk)-1],x0,y0).delete()
+    desk.pop(n)
+    
     Flag = judge(whose)
-    #print(Flag, whose, " = ", who)
-    printText()
+    log()
     if classify(who) != "KOG":
         print(whose, "win!!!")
         tk.messagebox.showinfo(whose, "胡了!!!")
@@ -82,61 +153,104 @@ def pickingupCard(who, whose):
 # 抽牌
 def drawingCard(who, whose):
     print("==", whose,"抽牌 ==")
-    who.append(elephant_num[0])
-    elephant_num.pop(0)
+    # 桌牌 # 抽最後一張牌
+    n = len(elephant_num)-1
+    who.append(elephant_num[n]) #elephant_num[0]
+    CloseChess(elephant_num[n],x1,y1).delete()
+    elephant_num.pop(n)
+    # 手牌
     if judge(whose) == "boss":
-        bossbox.delete(1.0, tk.END) #清空
-        bossbox.insert(tk.END, transChi(boss))
+        BossChess(boss[len(boss)-1],xb,yb,"boss").add()
     if judge(whose) == "user":
-        userbox.delete(1.0, tk.END) #清空
-        userbox.insert(tk.END, transChi(user))
+        UserChess(user[len(user)-1],xu,yu,"user").add()
+    
     Flag = judge(whose)
-    #print(Flag, whose, " = ", who)
-    printText()
+    log()
     if classify(who) != "KOG":
         print("you win")
         tk.messagebox.showinfo(whose, "胡了!!!")
         Flag = ""
     flag(Flag)
-# 出牌
+
+# 出牌 # 玩家
 def playingCard(who, whose):
     print("==", whose,"出牌 ==")
-    n = int(editbox1.get())
-    print(n)
-    print(who[n])
-    desk.append(who[n])
-    who.pop(n)
-    """
-    print("desk = ",transChi(desk))
-    print(whose, " = ", who)
-    """
-    printText()
-    if judge(whose) == "boss":
-        bossbox.delete(1.0, tk.END) #清空
-        bossbox.insert(tk.END, transChi(boss))
-    if judge(whose) == "user":
-        userbox.delete(1.0, tk.END) #清空
-        userbox.insert(tk.END, transChi(user))
-    deskbox.delete(1.0, tk.END) #清空
-    deskbox.insert(tk.END, transChi(desk))
-    if elephant_num == []:
-        tk.messagebox.showinfo("本局", "和局!!!")
-    Flag = "boss"
-    print("輪到", Flag)
-    flag(Flag)
-# 判定
+    def key(event):
+        keysym = repr(event.keysym)
+        print ("pressed", keysym)
+        
+        n = int(event.keysym) # 按下第幾顆棋
+        if n<0 or n>4:
+            tk.messagebox.showinfo("非數字", "請輸入0-4數字")
+        if judge(whose) == "user": 
+            for i in user:
+                UserChess(i,xu,yu,"user").delete() # 清除
+        # 桌牌
+        desk.append(who[n])
+        OpenChess(desk[len(desk)-1],x0,y0).add()
+        # 手牌
+        who.pop(n)
+        if judge(whose) == "user":
+            for i in user:
+                UserChess(i,xu,yu,"user").add()
+
+        log()
+        if elephant_num == []:
+            tk.messagebox.showinfo("本局", "和局!!!")
+        Flag = "boss"
+        print("輪到", Flag)
+        flag(Flag)
+        
+    win.bind('<Key>', key)
+    
+# 判定莊家or玩家
 def judge(whose):
     if whose == "莊家":
         return "boss"
     if whose == "玩家":
         return "user"
-def printText():
+# log
+def log():
     print("elephant = ",transChi(elephant_num))
     print(elephant_num)
     print("boss = ",transChi(boss),boss)
     print("user = ",transChi(user),user)
     print("desk = ",transChi(desk),desk)
 
+# 遊戲走向判斷
+def flag(Flag):
+    if Flag == "":
+        canvas.create_rectangle(0, 0, w, h, fill="#002240") #清空背景
+        desk.clear()
+        boss.clear()
+        user.clear()
+        elephant_num.clear()
+        label['text'] = "請按Enter開始"
+        win.bind('<Return>', dealingCard)
+        
+    elif Flag == "boss":
+        label['text'] = "輪到莊家"
+        if len(boss) <= 4:
+            win.after(1000,lambda:drawingCard(boss, "莊家")) #莊家抽牌
+            #if len(desk) > 0:
+            #        win.after(1000,lambda:pickingupCard(user, "莊家")) #按p:玩家撿牌
+        elif len(boss) > 4:
+            win.after(1000,bossPlayingCard) #莊家隨機出牌
+        
+    elif Flag == "user":
+        label['text'] = "輪到玩家"
+        if len(user) <= 4:
+            def fnEnter(e):
+                win.after(1000,lambda:drawingCard(user, "玩家"))
+            win.bind('<Return>', fnEnter) #按enter:玩家抽牌
+            if len(desk) > 0:
+                def fnP(e):
+                    win.after(1000,lambda:pickingupCard(user, "玩家")) 
+                win.bind('<p>', fnP) #按p:玩家撿牌
+        elif len(user) > 4:
+            win.after(1000,lambda:playingCard(user, "玩家")) #按0-4:玩家出牌
+        
+        
 global Flag
 
 # 象棋
@@ -145,101 +259,45 @@ elephant = [
     "馬","包","包","卒","卒","卒","卒","卒", #8-15
     "帥","仕","仕","相","相","俥","俥","傌", #16-23 
     "傌","炮","炮","兵","兵","兵","兵","兵"  #24-31
-]
+]    
 
-def flag(Flag):
-    if Flag == "":
-        label['text'] = "請開始"
-        button1.place(x=20+250, y=50)
-        bossDrawing.place_forget()
-        button5.place_forget()
-        button3.place_forget()
-        button4.place_forget()
-        button6.place_forget()
-        button7.place_forget()
-        editbox1.place_forget()
-        # 清空
-        deskbox.delete(1.0, tk.END) #清空
-        bossbox.delete(1.0, tk.END) #清空
-        userbox.delete(1.0, tk.END) #清空
-        desk.clear()
-        boss.clear()
-        user.clear()
-        elephant_num.clear()
-        for i in range(32):
-            elephant_num.append(i)
-    elif Flag == "boss":
-        label['text'] = "輪到莊家"
-        button1.place_forget()
-        button4.place_forget()
-        button6.place_forget()
-        button7.place_forget()
-        editbox1.place_forget()
-        if len(boss) <= 4:
-            #bossDrawing = tk.Button(win, text = "莊家抽牌", command = lambda:drawingCard(boss, "莊家"))
-            bossDrawing.place(x=20+250, y=90)
-        if len(desk) > 0:
-            #button5 = tk.Button(win, text = "莊家撿牌", command = lambda:pickingupCard(boss, "莊家"))
-            button5.place(x=90+250, y=90)
-        if len(boss) > 4:
-            #button3 = tk.Button(win, text = "莊家出牌", command = bossPlayingCard)
-            button5.place_forget()
-            bossDrawing.place_forget()
-            button3.place(x=160+250, y=90)
-    elif Flag == "user":
-        label['text'] = "輪到玩家"
-        button1.place_forget()
-        bossDrawing.place_forget()
-        button5.place_forget()
-        button3.place_forget()
-        if len(user) <= 4:
-            button4.place(x=20+250, y=130)
-        if len(desk) > 0:
-            button6.place(x=90+250, y=130)
-        if len(user) > 4:
-            button4.place_forget()
-            button6.place_forget()
-            button7.place(x=160+250, y=130)
-            editbox1.place(x=230+250, y=130)
-        
-        
-    
-# 象棋序號
-elephant_num = []
-for i in range(32):
-    elephant_num.append(i)
+elephant_num = [] #象棋序號
 
 boss = [] #莊家
 user = [] #玩家
-desk = [] #檯面
+desk = [] #桌面
 
 win = tk.Tk() #產生視窗
 win.title("象棋麻將") #視窗標題
 win.geometry("600x500") #調整視窗大小
 
+# Canvas
+w = 600
+h = 500
+canvas = tk.Canvas(win, width = w, height = h, bg = "#002240")
+canvas.place(x = 0, y = 0)
+
+grid = w / 12 #50
+# 莊家牌的錨點
+xb = w / 2 - grid * 2
+yb = grid * 2
+# 丟出牌的錨點
+x0 = grid
+y0 = yb + grid * 1.5
+# 待抽排的錨點
+x1 =(x0 + grid * 6) + grid * 4 
+y1 = y0 + grid * 3
+# 玩家牌的錨點
+xu = w / 2 - grid * 2
+yu = y1 + grid * 1.5
+
+
+
+# 遊戲指示
 Flag = ""
 label = tk.Label(win, text=Flag, font = ("微軟正黑體", 12))
-label.place(x=270, y=250)
-
-
-button1 = tk.Button(win, text = "發牌", command = dealingCard)
-
-#button2
-bossDrawing = tk.Button(win, text = "莊家抽牌", command = lambda:drawingCard(boss, "莊家"))
-button5 = tk.Button(win, text = "莊家撿牌", command = lambda:pickingupCard(boss, "莊家"))
-button3 = tk.Button(win, text = "莊家出牌", command = bossPlayingCard)
-button4 = tk.Button(win, text = "玩家抽牌", command = lambda:drawingCard(user, "玩家"))
-button6 = tk.Button(win, text = "玩家撿牌", command = lambda:pickingupCard(user, "玩家"))
-editbox1 = tk.Entry(width = 4, font = ("微軟正黑體", 12))
-button7 = tk.Button(win, text = "玩家出牌", command = lambda:playingCard(user, "玩家"))
-bossbox = tk.Text(win, font = ("微軟正黑體", 12))
-bossbox.place(x=20, y=50, width=200, height=100)
-deskbox = tk.Text(win, font = ("微軟正黑體", 12))
-deskbox.place(x=20, y=200, width=200, height=100)
-userbox = tk.Text(win, font = ("微軟正黑體", 12))
-userbox.place(x=20, y=350, width=200, height=100)
-
-
+#label.place(x=270, y=250)
+label.place(x=50, y=50)
 flag(Flag)
 
 win.mainloop() #持續顯示視窗
