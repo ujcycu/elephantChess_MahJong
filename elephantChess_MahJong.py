@@ -42,7 +42,7 @@ class CloseChess:
     # 方法
     def add(self):
         canvas.create_text(self.point, text="●", fill="green", font=("標楷體",34,"bold"))
-        canvas.create_text(self.point, text=(self.index,self.chi), fill="white", font=("標楷體",10,"bold"))
+        #canvas.create_text(self.point, text=(self.index,self.chi), fill="white", font=("標楷體",10,"bold"))
     def delete(self):
         canvas.create_text(self.point, text="●", fill="#002240", font=("標楷體",35,"bold"))
 
@@ -58,7 +58,7 @@ class BossChess():
         self.index = index
     def add(self):
         canvas.create_text(self.point, text="●", fill="green", font=("標楷體",34,"bold"))
-        canvas.create_text(self.point, text=self.chi, fill="black", font=("標楷體",19,"bold"))
+        #canvas.create_text(self.point, text=self.chi, fill="black", font=("標楷體",19,"bold"))
     def delete(self):
         canvas.create_text(self.point, text="●", fill="#002240", font=("標楷體",35,"bold"))
 class UserChess(BossChess):
@@ -77,34 +77,46 @@ class UserChess(BossChess):
 def shuffle(array):
     random.shuffle(array)
     #print(array)
-    
+
+
+t = 400 #間隔毫秒數
 # 發牌
 def dealingCard(e):
     print("== 發牌 ==")
     #shuffle(elephant)
+    labelStart['text'] = "發牌中"
     # 洗牌
     for i in range(32):
         elephant_num.append(i)
     shuffle(elephant_num)
     print("elephant_num length= ",len(elephant_num))
+
+    # 畫棋子
+    def bossChess():
+        boss.append(elephant_num[0])
+        elephant_num.pop(0)
+        BossChess(boss[-1],xb,yb,"boss").add()
+    def userChess():
+        user.append(elephant_num[0])
+        UserChess(user[-1],xu,yu,"user").add()
+        elephant_num.pop(0) 
     # 各發四張
     for i in range(4):
-        boss.append(elephant_num[0]) 
-        elephant_num.pop(0) 
-        user.append(elephant_num[0]) 
-        elephant_num.pop(0) 
+        win.after(i * 2 * t,bossChess)
+        win.after((i*2-1) * t,userChess)
+    
+    
+    # 待抽
+    def closechess():
+        labelStart.place_forget()
+        for i in elephant_num:
+            CloseChess(i,x1,y1).add()
+    win.after(8 * t,closechess)
     log() #log
-    # 畫棋子
-    for i in boss:
-        BossChess(i,xb,yb,"boss").add()
-    for i in user:
-        UserChess(i,xu,yu,"user").add()
-    for i in elephant_num:
-        CloseChess(i,x1,y1).add()
     # 輪到
     Flag = "boss"
     print("輪到", Flag)
-    flag(Flag)
+    win.after(9 * t,lambda:flag(Flag))
 
 # 莊家隨機出牌
 def bossPlayingCard():
@@ -179,9 +191,9 @@ def playingCard(who, whose):
         keysym = repr(event.keysym)
         print ("pressed", keysym)
         
-        n = int(event.keysym) # 按下第幾顆棋
+        n = int(event.keysym)-1 # 按下第幾顆棋
         if n<0 or n>4:
-            tk.messagebox.showinfo("非數字", "請輸入0-4數字")
+            tk.messagebox.showinfo("非數字", "請輸入1-5數字")
         if judge(whose) == "user": 
             for i in user:
                 UserChess(i,xu,yu,"user").delete() # 清除
@@ -225,11 +237,13 @@ def flag(Flag):
         boss.clear()
         user.clear()
         elephant_num.clear()
-        label['text'] = "請按Enter開始"
+        label2['text'] = ""
         win.bind('<Return>', dealingCard)
         
     elif Flag == "boss":
         label['text'] = "輪到莊家"
+        label.place(x=400, y=50)
+        label2['text'] = ""
         if len(boss) <= 4:
             win.after(1000,lambda:drawingCard(boss, "莊家")) #莊家抽牌
             #if len(desk) > 0:
@@ -238,8 +252,11 @@ def flag(Flag):
             win.after(1000,bossPlayingCard) #莊家隨機出牌
         
     elif Flag == "user":
+        labelStart.place_forget()
         label['text'] = "輪到玩家"
+        label.place(x=400, y=400)
         if len(user) <= 4:
+            label2['text'] = "抽牌：按Enter \n撿牌：按p"
             def fnEnter(e):
                 win.after(1000,lambda:drawingCard(user, "玩家"))
             win.bind('<Return>', fnEnter) #按enter:玩家抽牌
@@ -248,7 +265,8 @@ def flag(Flag):
                     win.after(1000,lambda:pickingupCard(user, "玩家")) 
                 win.bind('<p>', fnP) #按p:玩家撿牌
         elif len(user) > 4:
-            win.after(1000,lambda:playingCard(user, "玩家")) #按0-4:玩家出牌
+            label2['text'] = "選擇要丟出的牌編號 \n由左至右1-5"
+            win.after(1000,lambda:playingCard(user, "玩家")) #按1-5:玩家出牌
         
         
 global Flag
@@ -292,12 +310,16 @@ xu = w / 2 - grid * 2
 yu = y1 + grid * 1.5
 
 
-
+fontStyle = ["微軟正黑體", 12]
 # 遊戲指示
 Flag = ""
-label = tk.Label(win, text=Flag, font = ("微軟正黑體", 12))
+
+labelStart = tk.Label(win, text="請按Enter開始", bg = "#002240", fg="white", font = fontStyle)
+labelStart.place(x=w/2, y=h/2)
+label = tk.Label(win, text=Flag, bg = "#002240", fg="white", font = fontStyle)
 #label.place(x=270, y=250)
-label.place(x=50, y=50)
+label2 = tk.Label(win, text="", anchor="w", justify="left", bg = "#002240", fg="white", font = ("微軟正黑體", 12))
+label2.place(x=50, y=450)
 flag(Flag)
 
 win.mainloop() #持續顯示視窗
